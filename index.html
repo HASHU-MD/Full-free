@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HASHU-MD CLOUD DEPLOYER</title>
+    <style>
+        body { background: #050505; color: #00f2ff; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #111; padding: 25px; border: 1px solid #00f2ff; border-radius: 10px; width: 90%; max-width: 450px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        textarea, input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 5px; color: #fff; box-sizing: border-box; margin-bottom: 15px; outline: none; }
+        button { width: 100%; padding: 15px; background: transparent; border: 1px solid #00f2ff; color: #00f2ff; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        button:hover { background: #00f2ff; color: #000; }
+        #status { margin-top: 15px; font-size: 12px; text-align: center; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>[ SURGE HOST ]</h2>
+        <input type="text" id="subdomain" placeholder="Project Name (e.g. hashu-test)">
+        <textarea id="code" rows="10" placeholder="Paste HTML Code Here..."></textarea>
+        <button onclick="deploy()">Deploy to Cloud</button>
+        <div id="status">System Ready</div>
+    </div>
+
+    <script>
+        async function deploy() {
+            const sub = document.getElementById('subdomain').value;
+            const code = document.getElementById('code').value;
+            const status = document.getElementById('status');
+
+            if(!sub || !code) return alert("Hama ekakma purawanna!");
+
+            status.innerText = "Deploying... Please wait...";
+
+            // Replit eke server ekata data yawana widiya
+            try {
+                const res = await fetch('/deploy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subdomain: sub, html: code })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    status.innerHTML = `Success! <br> <a href="${data.url}" target="_blank" style="color:#00f2ff">${data.url}</a>`;
+                } else {
+                    status.innerText = "Error: " + data.message;
+                }
+            } catch (e) {
+                status.innerText = "Error connecting to server!";
+            }
+        }
+    </script>
+</body>
+  </html>
